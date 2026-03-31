@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEDDY Metabolomics Reference Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F5F0;--bg2:#EFEDE7;--surface:#FFFFFF;
+  --ink:#1A1916;--ink2:#6B6860;--ink3:#9B9890;
+  --accent:#C4512A;--accent2:#3A5F8A;
+  --border:rgba(26,25,22,0.1);--border2:rgba(26,25,22,0.06);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;min-height:100vh}
+
+.hdr{padding:32px 48px 28px;background:var(--surface);border-bottom:1px solid var(--border)}
+.hdr-eye{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#C4512A;margin-bottom:8px}
+.hdr-title{font-size:22px;font-weight:500;line-height:1.2;margin-bottom:6px}
+.hdr-sub{font-size:13px;color:var(--ink2);font-weight:300;margin-bottom:18px}
+.hdr-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink2);background:var(--bg);padding:4px 12px;border-radius:99px;border:1px solid var(--border)}
+.chip-dot{width:6px;height:6px;border-radius:50%}
+
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 48px}
+.tab{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;padding:14px 18px;border:none;background:transparent;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab:hover{color:var(--ink)}
+.tab.on{color:#C4512A;border-bottom-color:#C4512A}
+
+.body{padding:28px 48px 64px;max-width:1440px;margin:0 auto}
+.panel{display:none}.panel.on{display:block}
+
+.ctrl{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+select,input{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+select:focus,input:focus{border-color:var(--accent2)}
+input{width:240px}
+input::placeholder{color:var(--ink3)}
+
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);background:var(--surface);margin-bottom:4px}
+table{width:100%;border-collapse:collapse}
+thead th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);padding:11px 14px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+tbody td{padding:12px 14px;vertical-align:top;border-bottom:1px solid var(--border2);font-size:12px;line-height:1.55;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg2)}
+
+.mono{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+.paper-link{font-size:12px;font-weight:500;color:#3A5F8A;text-decoration:none;line-height:1.4;display:block}
+.paper-link:hover{text-decoration:underline;color:#C4512A}
+.jrnl{font-family:'DM Mono',monospace;font-size:9px;color:var(--ink3);margin-top:3px}
+
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap;letter-spacing:.03em}
+.b-t{background:#E6F1FB;color:#0C447C}
+.b-d{background:#EAF3DE;color:#27500A}
+.b-da{background:#FAEEDA;color:#633806}
+.b-o{background:#F1EFE8;color:#444441}
+
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-size:9px;font-family:'DM Mono',monospace;padding:1px 6px;margin:1px 2px;color:var(--ink)}
+.tag.hl{background:#FEF3E2;border-color:#D4920A;color:#7A5010}
+
+.kf-section{margin-top:32px}
+.kf-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.kf-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.kf-line{flex:1;height:1px;background:var(--border)}
+
+.kf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.kf-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.kf-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.kf-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.kf-ico-a{background:#FAEEDA;color:#7A5010}
+.kf-ico-b{background:#E6F1FB;color:#0C447C}
+.kf-ico-c{background:#EAF3DE;color:#27500A}
+.kf-ico-d{background:#EEEDFE;color:#3C3489}
+.kf-ico-e{background:#FAECE7;color:#993C1D}
+.kf-card-title{font-size:13px;font-weight:500;line-height:1.4;color:var(--ink)}
+.kf-card-body{font-size:12px;color:var(--ink2);line-height:1.6}
+.kf-refs{margin-top:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--ink3);padding-top:8px;border-top:1px solid var(--border2)}
+
+.overlap-warn{margin-top:20px;padding:14px 18px;background:#FEF3E2;border:1px solid #D4920A;border-radius:8px;font-size:12px;color:#7A5010;line-height:1.6}
+.overlap-warn strong{font-weight:500;color:#4A2C00}
+
+.met-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:20px}
+.met-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.met-count{font-family:'DM Mono',monospace;font-size:22px;font-weight:300;color:var(--ink3);width:26px;flex-shrink:0;line-height:1.1}
+.met-name{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--ink)}
+.met-papers{font-family:'DM Mono',monospace;font-size:9px;color:var(--ink3);margin-bottom:5px}
+.met-dir{font-size:12px;color:var(--ink2);line-height:1.5}
+.met-card.top{border-color:#D4920A;background:#FFFBF5}
+.met-card.top .met-count{color:#C4512A}
+
+.no-results{text-align:center;padding:40px;color:var(--ink3);font-family:'DM Mono',monospace;font-size:11px}
+
+@media(max-width:768px){
+  .hdr,.tabs,.body{padding-left:20px;padding-right:20px}
+  .tabs{padding:0 20px}
+  .tab{padding:12px 12px;font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-eye">TEDDY Metabolomics · Literature Reference Analysis</div>
+  <div class="hdr-title">T1D Metabolomics &amp; Lipidomics — 16-Paper Overview</div>
+  <div class="hdr-sub">Data modality, cohort characteristics, patient groups, and cross-paper metabolite overlap across TEDDY NCC1, DIPP, and DAISY cohorts</div>
+  <div class="hdr-chips">
+    <span class="chip"><span class="chip-dot" style="background:#3A5F8A"></span>TEDDY NCC1 — 5 papers</span>
+    <span class="chip"><span class="chip-dot" style="background:#4A7A5E"></span>DIPP — 2 papers</span>
+    <span class="chip"><span class="chip-dot" style="background:#A06B1A"></span>DAISY — 2 papers</span>
+    <span class="chip"><span class="chip-dot" style="background:#888"></span>Background / Other — 7 papers</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('overview',this)">01 — Overview</button>
+  <button class="tab" onclick="switchTab('modality',this)">02 — Modality &amp; Cohort</button>
+  <button class="tab" onclick="switchTab('overlap',this)">03 — Metabolite Overlap</button>
+</div>
+
+<div class="body">
+
+<!-- TAB 1 -->
+<div id="tab-overview" class="panel on">
+  <div class="ctrl">
+    <select id="f-cohort" onchange="renderOverview()">
+      <option value="">All cohorts</option>
+      <option value="TEDDY NCC1">TEDDY NCC1</option>
+      <option value="DIPP">DIPP</option>
+      <option value="DAISY">DAISY</option>
+      <option value="Other">Other / Background</option>
+    </select>
+    <input id="f-search" oninput="renderOverview()" placeholder="Search metabolite, author, or keyword…">
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th style="min-width:210px">Paper</th><th>Cohort</th>
+        <th style="min-width:160px">Data Modality</th><th style="min-width:120px">Sample (N)</th>
+        <th style="min-width:100px">Age / Follow-up</th><th style="min-width:110px">AAB Groups</th>
+        <th style="min-width:210px">Key Metabolites</th><th style="min-width:210px">Main Conclusion</th>
+      </tr></thead>
+      <tbody id="ov-body"></tbody>
+    </table>
+  </div>
+  <div class="kf-section">
+    <div class="kf-header"><span class="kf-label">Key Findings — Overview</span><span class="kf-line"></span></div>
+    <div class="kf-grid">
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-a">◈</div><div class="kf-card-title">TEDDY NCC1 Dominates the Field</div></div>
+        <div class="kf-card-body">5 of 10 core metabolomics papers draw from the same TEDDY NCC1 nested case-control dataset (~414–418 IA cases, 1:3 matched controls). These are not independent cohorts — results represent convergent analyses from a shared sample pool, not independent replication.</div>
+        <div class="kf-refs">Papers: #3, #4, #5, #6, #7</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-b">◎</div><div class="kf-card-title">Pre-seroconversion Window Is the Key Timeframe</div></div>
+        <div class="kf-card-body">All TEDDY NCC1 studies profile plasma at 3-month intervals from birth to first autoantibody appearance. Metabolic signals are detectable as early as 12 months before seroconversion (Balzano-Nogueira 2021), with some signals present at birth (Orešič 2008, DIPP).</div>
+        <div class="kf-refs">Papers: #1, #3, #4, #5, #7</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-c">◉</div><div class="kf-card-title">IAA-first vs. GADA-first Have Distinct Metabolic Signatures</div></div>
+        <div class="kf-card-body">TEDDY NCC1 studies consistently distinguish the two seroconversion subtypes. IAA-first is preceded by ↓BCAAs (leucine, isoleucine, valine); GADA-first by ↓proline. This subtype-specificity is a unique advantage of the TEDDY longitudinal design.</div>
+        <div class="kf-refs">Papers: #3, #7</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-d">◆</div><div class="kf-card-title">Multi-omics Integration Substantially Improves Prediction</div></div>
+        <div class="kf-card-body">Integrating metabolomics with genetic (SNPs, HLA) and environmental data yields substantially better predictive performance. Webb-Robertson 2021 achieved AUC 0.74; Frohnert 2020 (DAISY) achieved AUC 0.92 for T1D stage progression — metabolomics alone is insufficient.</div>
+        <div class="kf-refs">Papers: #6, #10</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-e">▤</div><div class="kf-card-title">Papers #11–16: Background &amp; Methods Context</div></div>
+        <div class="kf-card-body">Papers #11–13 establish clinical/genetic progression benchmarks (JAMA 2013: ~70–84% T1D risk in mAb+ children). Papers #14–16 provide a 2025 TEDDY review, a cross-cohort SM–immune mechanism, and a statistical methods precedent for joint longitudinal-survival modeling.</div>
+        <div class="kf-refs">Papers: #11, #12, #13, #14, #15, #16</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2 -->
+<div id="tab-modality" class="panel">
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th style="min-width:210px">Paper</th><th>Cohort</th>
+        <th style="min-width:170px">Primary Modality</th><th style="min-width:150px">Platform / Method</th>
+        <th>Matrix</th><th>N Cases</th><th>N Controls</th><th style="min-width:140px">Comparison Groups</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="mono">1</td>
+          <td><a class="paper-link" href="https://rupress.org/jem/article/205/13/2975/47163/Dysregulation-of-lipid-and-amino-acid-metabolism" target="_blank">Dysregulation of lipid and amino acid metabolism precedes islet autoimmunity in children who later progress to T1D</a><div class="jrnl">Orešič M et al. &middot; J Exp Med &middot; 2008</div></td>
+          <td><span class="badge b-d">DIPP</span></td>
+          <td>Longitudinal serum metabolomics &amp; lipidomics</td><td>GC-MS, LC-MS</td><td>Serum</td>
+          <td>~56 T1D prog.</td><td>~56 matched</td><td>ND / IA+ / T1D</td></tr>
+        <tr><td class="mono">2</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/diabetes/article/62/11/3951/33901/Decreased-Cord-Blood-Phospholipids-in-Young-Age-at" target="_blank">Decreased cord-blood phospholipids in young age-at-onset type 1 diabetes</a><div class="jrnl">La Torre D et al. &middot; Diabetes &middot; 2013</div></td>
+          <td><span class="badge b-o">DiPiS</span></td>
+          <td>Cord-blood lipidomics / metabolomics</td><td>LC-MS</td><td>Cord blood</td>
+          <td>~56 young T1D</td><td>~56 matched</td><td>Young-onset T1D vs. controls</td></tr>
+        <tr><td class="mono">3</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/diabetes/article/69/3/465/39778/Longitudinal-Metabolome-Wide-Signals-Prior-to-the" target="_blank">Longitudinal metabolome-wide signals prior to the appearance of a first islet autoantibody in children participating in the TEDDY study</a><div class="jrnl">Li Q et al. &middot; Diabetes &middot; 2020</div></td>
+          <td><span class="badge b-t">TEDDY NCC1</span></td>
+          <td>Longitudinal plasma metabolomics &amp; lipidomics</td><td>GC-TOF MS, LC-QTOF MS</td><td>Plasma</td>
+          <td>414 IA cases</td><td>~1,242 (1:3)</td><td>IAA-first / GADA-first / ND</td></tr>
+        <tr><td class="mono">4</td>
+          <td><a class="paper-link" href="https://www.nature.com/articles/s41598-019-51251-4" target="_blank">Metabolite-related dietary patterns and the development of islet autoimmunity</a><div class="jrnl">Johnson RK et al. &middot; Sci Reports &middot; 2019</div></td>
+          <td><span class="badge b-t">TEDDY NCC1</span></td>
+          <td>Plasma metabolomics &amp; lipidomics + dietary pattern analysis</td><td>GC-MS, LC-MS (853 metabolites)</td><td>Plasma</td>
+          <td>352 IA sets</td><td>Matched controls</td><td>IA / mAb+ / ND</td></tr>
+        <tr><td class="mono">5</td>
+          <td><a class="paper-link" href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02262-w" target="_blank">Integrative analyses of TEDDY omics data reveal lipid metabolism abnormalities, increased intracellular ROS and heightened inflammation prior to autoimmunity for type 1 diabetes</a><div class="jrnl">Balzano-Nogueira L et al. &middot; Genome Biology &middot; 2021</div></td>
+          <td><span class="badge b-t">TEDDY NCC1</span></td>
+          <td>Multi-omics: transcriptomics + metabolomics + dietary biomarkers</td><td>RNA-seq, GC-MS/LC-MS, immunoassay</td><td>Plasma + PBMC</td>
+          <td>IA cases (subset)</td><td>Matched controls</td><td>IA+ vs. ND (5 time points)</td></tr>
+        <tr><td class="mono">6</td>
+          <td><a class="paper-link" href="https://onlinelibrary.wiley.com/doi/10.1111/1753-0407.13093" target="_blank">Prediction of the development of islet autoantibodies through integration of environmental, genetic, and metabolic markers</a><div class="jrnl">Webb-Robertson B-JM et al. &middot; J Diabetes &middot; 2021</div></td>
+          <td><span class="badge b-t">TEDDY NCC1</span></td>
+          <td>ML: genetic (SNPs+HLA) + environmental + metabolomics</td><td>221-feature ensemble ML</td><td>Plasma</td>
+          <td>IA cases</td><td>Matched controls</td><td>Persistent IA+ vs. ND</td></tr>
+        <tr><td class="mono">7</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/diabetes/article/70/1/282/18438/Plasma-Metabolome-and-Circulating-Vitamins" target="_blank">Plasma metabolome and circulating vitamins stratified onset age of an initial islet autoantibody and progression to type 1 diabetes: the TEDDY study</a><div class="jrnl">Li Q et al. &middot; Diabetes &middot; 2021</div></td>
+          <td><span class="badge b-t">TEDDY NCC1</span></td>
+          <td>Longitudinal lipidome + vitamins + erythrocyte fatty acids</td><td>LC-MS + immunoassay + GC</td><td>Plasma + RBC</td>
+          <td>418 IA cases</td><td>~1,254 (1:3)</td><td>IAA-first / GADA-first / T1D progressors</td></tr>
+        <tr><td class="mono">8</td>
+          <td><a class="paper-link" href="https://www.nature.com/articles/s41598-018-28907-8" target="_blank">Dynamics of plasma lipidome in progression to islet autoimmunity and type 1 diabetes — DIPP</a><div class="jrnl">Lamichhane S et al. &middot; Sci Reports &middot; 2018</div></td>
+          <td><span class="badge b-d">DIPP</span></td>
+          <td>Longitudinal plasma lipidomics</td><td>LC-MS</td><td>Plasma</td>
+          <td>40 T1D prog.</td><td>40 IA-only + 40 CTR</td><td>T1D prog. / IA-only / CTR</td></tr>
+        <tr><td class="mono">9</td>
+          <td><a class="paper-link" href="https://onlinelibrary.wiley.com/doi/10.1111/pedi.13085" target="_blank">Metabolomics-related nutrient patterns at seroconversion and risk of progression to type 1 diabetes</a><div class="jrnl">Johnson RK et al. &middot; Pediatric Diabetes &middot; 2020</div></td>
+          <td><span class="badge b-da">DAISY</span></td>
+          <td>Metabolomics at seroconversion + dietary nutrient-pattern analysis (RRR)</td><td>GC-MS + reduced rank regression</td><td>Serum</td>
+          <td>IA seroconverters</td><td>Matched controls</td><td>IA → T1D progression</td></tr>
+        <tr><td class="mono">10</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/diabetes/article/69/2/238/16226/Predictive-Modeling-of-Type-1-Diabetes-Stages" target="_blank">Predictive modeling of type 1 diabetes stages using disparate data sources</a><div class="jrnl">Frohnert BI et al. &middot; Diabetes &middot; 2020</div></td>
+          <td><span class="badge b-da">DAISY</span></td>
+          <td>Integrated genetic + immunologic + metabolomic + proteomic ML</td><td>Multiple platforms, ensemble ML</td><td>Serum</td>
+          <td>NCC subset</td><td>Matched (AUC 0.92)</td><td>IA onset / T1D stage progression</td></tr>
+        <tr><td class="mono">11</td>
+          <td><a class="paper-link" href="https://jamanetwork.com/journals/jama/fullarticle/1697963" target="_blank">Seroconversion to multiple islet autoantibodies and risk of progression to diabetes in children</a><div class="jrnl">Ziegler AG et al. &middot; JAMA &middot; 2013</div></td>
+          <td><span class="badge b-o">Pooled cohorts</span></td>
+          <td>Clinical / immunologic (autoantibody + progression)</td><td>Autoantibody assays</td><td>Blood</td>
+          <td>~585 mAb+</td><td>Sero-negative</td><td>mAb+ vs. single-AAB</td></tr>
+        <tr><td class="mono">12</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/diabetes/article/66/12/3122/35245/The-Influence-of-Type-1-Diabetes-Genetic" target="_blank">The influence of T1D genetic susceptibility regions, age, sex, and family history on progression from multiple autoantibodies to T1D: a TEDDY study report</a><div class="jrnl">Krischer JP et al. &middot; Diabetes &middot; 2017</div></td>
+          <td><span class="badge b-t">TEDDY</span></td>
+          <td>Clinical / genetic progression analysis</td><td>HLA + non-HLA SNP genotyping</td><td>Blood</td>
+          <td>mAb+ children</td><td>—</td><td>mAb+ → T1D progression</td></tr>
+        <tr><td class="mono">13</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/care/article/41/9/1887/40747/A-Type-1-Diabetes-Genetic-Risk-Score-Predicts" target="_blank">A T1D genetic risk score predicts progression of islet autoimmunity and development of T1D in individuals at risk</a><div class="jrnl">Redondo MJ et al. &middot; Diabetes Care &middot; 2018</div></td>
+          <td><span class="badge b-o">TrialNet</span></td>
+          <td>Genetic risk score analysis</td><td>30-SNP GRS + ImmunoChip</td><td>Blood</td>
+          <td>AAB+ relatives</td><td>—</td><td>IA → T1D stage</td></tr>
+        <tr><td class="mono">14</td>
+          <td><a class="paper-link" href="https://diabetesjournals.org/care/article/48/7/1125/158197/" target="_blank">Unfolding the mystery of autoimmunity: the Environmental Determinants of Diabetes in the Young (TEDDY) study</a><div class="jrnl">Rewers M et al. &middot; Diabetes Care &middot; 2025</div></td>
+          <td><span class="badge b-t">TEDDY</span></td>
+          <td>Review — clinical, omics, and environmental TEDDY outputs</td><td>—</td><td>—</td><td>—</td><td>—</td><td>Comprehensive TEDDY review</td></tr>
+        <tr><td class="mono">15</td>
+          <td><a class="paper-link" href="https://link.springer.com/article/10.1038/s44320-025-00146-w" target="_blank">Deciphering cross-cohort metabolic signatures of immune responses and their implications for disease pathogenesis</a><div class="jrnl">Fu J et al. &middot; Mol Syst Biol &middot; 2025</div></td>
+          <td><span class="badge b-o">3 non-T1D cohorts</span></td>
+          <td>Metabolomics + immune cytokine-response profiling + functional validation</td><td>LC-MS + cytokine assays</td><td>Plasma</td>
+          <td>non-T1D subjects</td><td>—</td><td>Immune-metabolite correlation</td></tr>
+        <tr><td class="mono">16</td>
+          <td><a class="paper-link" href="https://academic.oup.com/bioinformatics/article/42/3/btag038/8438630" target="_blank">Joint modeling of longitudinal biomarker and survival outcomes with competing risk in nested case-control studies — TEDDY microbiome dataset</a><div class="jrnl">Zhao L et al. &middot; Bioinformatics &middot; 2026</div></td>
+          <td><span class="badge b-t">TEDDY</span></td>
+          <td>Statistical methods — joint longitudinal-survival analysis</td><td>Bayesian joint model</td><td>Microbiome</td>
+          <td>—</td><td>—</td><td>Methods precedent</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="kf-section">
+    <div class="kf-header"><span class="kf-label">Key Findings — Data Modality &amp; Cohort</span><span class="kf-line"></span></div>
+    <div class="kf-grid">
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-b">▣</div><div class="kf-card-title">Plasma LC-MS / GC-MS is the Dominant Platform</div></div>
+        <div class="kf-card-body">All TEDDY NCC1 metabolomics studies use plasma sampled at 3-month intervals from birth. Platforms are UC Davis West Coast Metabolomics Center (GC-TOF MS, LC-QTOF MS). This uniformity enables direct metabolite-level comparison across papers #3–#7.</div>
+        <div class="kf-refs">Papers: #3, #4, #5, #6, #7</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-c">▤</div><div class="kf-card-title">DIPP Used Serum; DAISY Analyzed at Seroconversion</div></div>
+        <div class="kf-card-body">DIPP studies (Orešič 2008, Lamichhane 2018) used serum from birth cohorts, while DAISY studies analyzed serum at or near seroconversion. These differ from TEDDY's continuous plasma profiling strategy — direct metabolite comparisons across cohorts require caution.</div>
+        <div class="kf-refs">Papers: #1, #8, #9, #10</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-e">▦</div><div class="kf-card-title">Sample Sizes Vary Widely Across Cohorts</div></div>
+        <div class="kf-card-body">TEDDY NCC1 is the largest metabolomics resource: 414–418 IA cases with 1:3 matching (~1,200–1,250 controls). DIPP studies used only 40 per group. This disparity means TEDDY findings carry substantially more statistical power for metabolite discovery.</div>
+        <div class="kf-refs">Papers: #3, #7 vs. #8</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-d">◈</div><div class="kf-card-title">Multi-omics Studies Add RBC &amp; Transcriptomics Layers</div></div>
+        <div class="kf-card-body">Li Q 2021 (#7) uniquely combined plasma lipidome with erythrocyte membrane fatty acids and circulating vitamins. Balzano-Nogueira 2021 (#5) added PBMC transcriptomics — the only study integrating gene expression with the TEDDY metabolome.</div>
+        <div class="kf-refs">Papers: #5, #7</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3 -->
+<div id="tab-overlap" class="panel">
+  <div class="met-grid" id="met-grid"></div>
+  <div class="overlap-warn">
+    <strong>Data overlap note — TEDDY NCC1 papers (#3, #4, #5, #6, #7):</strong> All five papers draw from the same nested case-control dataset. Shared metabolite findings across these papers represent convergent analyses of the same patient sample, not independent replication. True cross-cohort replication exists only when a signal appears in DIPP or DAISY studies as well.
+  </div>
+  <div class="kf-section">
+    <div class="kf-header"><span class="kf-label">Key Findings — Metabolite Overlap</span><span class="kf-line"></span></div>
+    <div class="kf-grid">
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-a">◈</div><div class="kf-card-title">Phosphatidylcholines Are the Most Replicated Signal</div></div>
+        <div class="kf-card-body">PCs appear in 6 papers across DIPP and TEDDY NCC1, consistently decreased in IA and T1D progressors from birth onward. This is the strongest cross-cohort replicated lipid signal in the T1D metabolomics literature to date.</div>
+        <div class="kf-refs">Papers: #1, #3, #4, #5, #7, #8</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-e">◉</div><div class="kf-card-title">Adipic Acid: GEE Analysis Adds Critical Longitudinal Depth</div></div>
+        <div class="kf-card-body">Adipic acid appears in papers #4 and #6 as a risk-associated dicarboxylic acid. The GEE analysis provides the first longitudinal ND → AAB+ → T1D three-stage gradient for this metabolite — the most mechanistically informative report on this signal to date.</div>
+        <div class="kf-refs">Papers: #4, #6 + GEE analysis</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-b">◆</div><div class="kf-card-title">Sphingomyelins Link Lipidome to Immune Function</div></div>
+        <div class="kf-card-body">SMs appear in 5 papers and are consistently decreased in progressors. Fu 2025 (#15) provides a mechanistic link, showing SMs negatively regulate monocyte-derived cytokine production across non-T1D cohorts — supporting a functional explanation for the SM signal.</div>
+        <div class="kf-refs">Papers: #4, #5, #7, #8, #15</div>
+      </div>
+      <div class="kf-card">
+        <div class="kf-card-top"><div class="kf-icon kf-ico-c">▣</div><div class="kf-card-title">Triglycerides Show Stage-Dependent Directionality</div></div>
+        <div class="kf-card-body">TG signals are complex: decreased in early infancy (DIPP, #1, #8); unsaturated TGs decreased at seroconversion (#3, #4). The apparent contradiction reflects stage- and subtype-specific dynamics — emphasizing the need for longitudinal, not cross-sectional, designs.</div>
+        <div class="kf-refs">Papers: #1, #3, #4, #7, #8</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const PAPERS=[
+  {n:'1',title:'Dysregulation of lipid and amino acid metabolism precedes islet autoimmunity in children who later progress to T1D',authors:'Orešič M et al.',journal:'J Exp Med',year:2008,url:'https://rupress.org/jem/article/205/13/2975/47163/Dysregulation-of-lipid-and-amino-acid-metabolism',cohort:'DIPP',modality:'Longitudinal serum metabolomics & lipidomics (GC-MS, LC-MS)',ncases:'~56 T1D prog.',nctrl:'~56 matched',age:'Birth → T1D onset',aab:'ND / IA+ / T1D',mets:['Succinic acid','PC','TGs','Ether phospholipids','LysoPCs','GABA','Glutamic acid','Alanine'],conclusion:'Metabolic dysregulation detectable at birth; lipid + amino acid changes precede islet autoimmunity by years'},
+  {n:'2',title:'Decreased cord-blood phospholipids in young age-at-onset type 1 diabetes',authors:'La Torre D et al.',journal:'Diabetes',year:2013,url:'https://diabetesjournals.org/diabetes/article/62/11/3951/33901/Decreased-Cord-Blood-Phospholipids-in-Young-Age-at',cohort:'Other',modality:'Cord-blood lipidomics (LC-MS)',ncases:'~56 young T1D',nctrl:'~56 matched',age:'Birth (cord blood)',aab:'Young-onset T1D vs. controls',mets:['PCs','PEs','TGs','LPCs'],conclusion:'Reduced cord-blood phospholipids at birth in children who developed early-onset T1D'},
+  {n:'3',title:'Longitudinal metabolome-wide signals prior to the appearance of a first islet autoantibody in children participating in the TEDDY study',authors:'Li Q et al.',journal:'Diabetes',year:2020,url:'https://diabetesjournals.org/diabetes/article/69/3/465/39778/Longitudinal-Metabolome-Wide-Signals-Prior-to-the',cohort:'TEDDY NCC1',modality:'Longitudinal plasma metabolomics & lipidomics (GC-TOF MS, LC-QTOF MS)',ncases:'414 IA cases',nctrl:'~1,242 (1:3)',age:'3 months → seroconversion (≤72 mo)',aab:'IAA-first / GADA-first / ND',mets:['BCAAs (Leu/Ile/Val)','Proline','DHAA','GABA','Methionine','Alanine','Ether PCs'],conclusion:'IAA-first preceded by ↓BCAAs; GADA-first by ↓proline; DHAA is risk factor for both subtypes'},
+  {n:'4',title:'Metabolite-related dietary patterns and the development of islet autoimmunity',authors:'Johnson RK et al.',journal:'Scientific Reports',year:2019,url:'https://www.nature.com/articles/s41598-019-51251-4',cohort:'TEDDY NCC1',modality:'Plasma metabolomics & lipidomics + dietary pattern analysis (853 metabolites)',ncases:'352 IA sets',nctrl:'Matched controls',age:'Infancy → seroconversion',aab:'IA / mAb+ / ND',mets:['Adipic acid','Succinic acid','Malic acid','PCs','PEs','SMs','GlcCer','Ether phospholipids','Unsaturated TGs'],conclusion:'Adipic acid ↑ in higher mAb+ risk; PCs/PEs/SMs/GlcCer consistently ↓ across time points'},
+  {n:'5',title:'Integrative analyses of TEDDY omics data reveal lipid metabolism abnormalities, increased intracellular ROS and heightened inflammation prior to autoimmunity for type 1 diabetes',authors:'Balzano-Nogueira L et al.',journal:'Genome Biology',year:2021,url:'https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02262-w',cohort:'TEDDY NCC1',modality:'Multi-omics: transcriptomics + metabolomics/lipidomics + dietary biomarkers',ncases:'IA cases (subset)',nctrl:'Matched controls',age:'12 months before seroconversion (5 time points)',aab:'IA+ vs. ND',mets:['Fatty acids','Cholesterol','PEs','SMs','PCs','TGs','Ceramides','Vitamin C','Vitamin D'],conclusion:'Multi-omics signature detectable ≥12 months pre-seroconversion; ROS, inflammation, lipid dysregulation, APC activation'},
+  {n:'6',title:'Prediction of the development of islet autoantibodies through integration of environmental, genetic, and metabolic markers',authors:'Webb-Robertson B-JM et al.',journal:'J Diabetes',year:2021,url:'https://onlinelibrary.wiley.com/doi/10.1111/1753-0407.13093',cohort:'TEDDY NCC1',modality:'ML: genetic (SNPs+HLA) + environmental + metabolomics (221 features)',ncases:'IA cases',nctrl:'Matched controls (AUC 0.74)',age:'Within 6 months pre-IA',aab:'Persistent IA+ vs. ND',mets:['Adipic acid','Ceramide d42:0','PC(40:5)','LPC(18:2)','LPC(18:3)','Azelaic acid','TG(60:11)'],conclusion:'Integrating genetics + environment + metabolomics improved IA prediction; lipid oxidation and PLA2 signaling dominant'},
+  {n:'7',title:'Plasma metabolome and circulating vitamins stratified onset age of an initial islet autoantibody and progression to type 1 diabetes: the TEDDY study',authors:'Li Q et al.',journal:'Diabetes',year:2021,url:'https://diabetesjournals.org/diabetes/article/70/1/282/18438/Plasma-Metabolome-and-Circulating-Vitamins',cohort:'TEDDY NCC1',modality:'Longitudinal lipidome + vitamins + erythrocyte fatty acids',ncases:'418 IA cases',nctrl:'~1,254 (1:3)',age:'12 months → seroconversion',aab:'IAA-first / GADA-first / T1D progressors',mets:['Ascorbic acid','Cholesterol','SMs','25(OH)D','DGs','LPCs','TGs','Alanine'],conclusion:'Temporal lipidome clusters stratified first-AAB onset age; ↓SMs and ↓vitamins predict T1D progression'},
+  {n:'8',title:'Dynamics of plasma lipidome in progression to islet autoimmunity and type 1 diabetes — DIPP',authors:'Lamichhane S et al.',journal:'Scientific Reports',year:2018,url:'https://www.nature.com/articles/s41598-018-28907-8',cohort:'DIPP',modality:'Longitudinal plasma lipidomics (LC-MS)',ncases:'40 T1D prog.',nctrl:'40 IA-only + 40 CTR',age:'Birth → T1D / follow-up end',aab:'T1D progressors / IA-only / CTR',mets:['SMs','TGs','PCs'],conclusion:'SMs persistently ↓ in T1D progressors; T1D-specific signals differ from general IA signals'},
+  {n:'9',title:'Metabolomics-related nutrient patterns at seroconversion and risk of progression to type 1 diabetes',authors:'Johnson RK et al.',journal:'Pediatric Diabetes',year:2020,url:'https://onlinelibrary.wiley.com/doi/10.1111/pedi.13085',cohort:'DAISY',modality:'Metabolomics at seroconversion + dietary nutrient-pattern analysis (RRR)',ncases:'IA seroconverters',nctrl:'Matched controls',age:'At seroconversion',aab:'IA → T1D progressors',mets:['Threonine','Histidine','Choline','Linoleic acid','Niacin','Riboflavin'],conclusion:'Nutrient pattern (↓linoleic acid, ↓niacin; ↑sugars) associated with faster IA→T1D progression (HR 3.17)'},
+  {n:'10',title:'Predictive modeling of type 1 diabetes stages using disparate data sources',authors:'Frohnert BI et al.',journal:'Diabetes',year:2020,url:'https://diabetesjournals.org/diabetes/article/69/2/238/16226/Predictive-Modeling-of-Type-1-Diabetes-Stages',cohort:'DAISY',modality:'Integrated genetic + immunologic + metabolomic + proteomic ML',ncases:'NCC subset',nctrl:'Matched (AUC 0.92)',age:'Longitudinal',aab:'IA onset / T1D stage progression',mets:['Serum ascorbate','3-methyl-oxobutyrate','Glucose','Mannose','ADP fibrinogen'],conclusion:'Multi-source ML predicted IA onset and T1D progression (AUC 0.92); different predictor sets per stage'},
+  {n:'11',title:'Seroconversion to multiple islet autoantibodies and risk of progression to diabetes in children',authors:'Ziegler AG et al.',journal:'JAMA',year:2013,url:'https://jamanetwork.com/journals/jama/fullarticle/1697963',cohort:'Other',modality:'Clinical / immunologic — autoantibody + progression data',ncases:'~585 mAb+',nctrl:'Sero-negative',age:'Birth → T1D (pooled cohorts)',aab:'mAb+ vs. single-AAB vs. ND',mets:['None (clinical/immunologic study)'],conclusion:'Children with multiple islet AABs had ~70% T1D risk at 10 years and ~84% at 15 years; mAb+ is a powerful high-risk state'},
+  {n:'12',title:'The influence of T1D genetic susceptibility regions, age, sex, and family history on progression from multiple autoantibodies to T1D: a TEDDY study report',authors:'Krischer JP et al.',journal:'Diabetes',year:2017,url:'https://diabetesjournals.org/diabetes/article/66/12/3122/35245/The-Influence-of-Type-1-Diabetes-Genetic',cohort:'TEDDY NCC1',modality:'Clinical / genetic progression analysis',ncases:'mAb+ children',nctrl:'—',age:'From mAb+ onset → T1D',aab:'mAb+ → T1D progression',mets:['None (clinical/genetic study)'],conclusion:'Age at mAb+ onset, sex, and non-HLA SNPs (TNFAIP3, INS) influenced mAb+→T1D progression; family history and HLA not significant after multi-AAB onset'},
+  {n:'13',title:'A T1D genetic risk score predicts progression of islet autoimmunity and development of T1D in individuals at risk',authors:'Redondo MJ et al.',journal:'Diabetes Care',year:2018,url:'https://diabetesjournals.org/care/article/41/9/1887/40747/A-Type-1-Diabetes-Genetic-Risk-Score-Predicts',cohort:'Other',modality:'Genetic risk score analysis — 30-SNP GRS + ImmunoChip',ncases:'AAB+ relatives',nctrl:'—',age:'Longitudinal follow-up',aab:'IA → T1D stage',mets:['None (genetic study)'],conclusion:'T1D GRS independently predicted progression to T1D (HR 1.29 per 0.05 GRS increase) and improved stage-based prediction in AAB+ relatives'},
+  {n:'14',title:'Unfolding the mystery of autoimmunity: the Environmental Determinants of Diabetes in the Young (TEDDY) study',authors:'Rewers M et al.',journal:'Diabetes Care',year:2025,url:'https://diabetesjournals.org/care/article/48/7/1125/158197/',cohort:'TEDDY NCC1',modality:'Review — clinical, omics, and environmental TEDDY outputs',ncases:'—',nctrl:'—',age:'—',aab:'Comprehensive review',mets:['None (review paper)'],conclusion:'TEDDY has generated extensive metabolomic evidence for early disease-associated changes, but mechanism of T1D progression not yet fully clarified'},
+  {n:'15',title:'Deciphering cross-cohort metabolic signatures of immune responses and their implications for disease pathogenesis',authors:'Fu J et al.',journal:'Mol Syst Biol',year:2025,url:'https://link.springer.com/article/10.1038/s44320-025-00146-w',cohort:'Other',modality:'Metabolomics + immune cytokine-response profiling + functional validation',ncases:'non-T1D subjects',nctrl:'—',age:'Cross-sectional (3 cohorts)',aab:'Immune response subgroups',mets:['Sphingomyelin','Phosphatidylcholine'],conclusion:'Sphingomyelin negatively correlated with monocyte-derived cytokine production (functionally validated); sphingolipids may modulate immune behavior broadly'},
+  {n:'16',title:'Joint modeling of longitudinal biomarker and survival outcomes with competing risk in nested case-control studies — TEDDY microbiome dataset',authors:'Zhao L et al.',journal:'Bioinformatics',year:2026,url:'https://academic.oup.com/bioinformatics/article/42/3/btag038/8438630',cohort:'TEDDY NCC1',modality:'Statistical methods — joint longitudinal-survival analysis',ncases:'—',nctrl:'—',age:'Longitudinal',aab:'Methods paper',mets:['None (methods paper)'],conclusion:'Joint longitudinal-survival modeling framework validated in TEDDY microbiome data; methodological precedent for longitudinal biomarker + time-to-event analyses'}
+];
+
+const SHARED=['Adipic acid','PCs','SMs','TGs','BCAAs','Proline','GABA','LPCs','25(OH)D','Ceramide','Ether phospholipids','PEs','Ascorbic acid','DHAA','Cholesterol'];
+
+function cohortBadge(c){
+  if(c==='TEDDY NCC1')return'<span class="badge b-t">TEDDY NCC1</span>';
+  if(c==='DIPP')return'<span class="badge b-d">DIPP</span>';
+  if(c==='DAISY')return'<span class="badge b-da">DAISY</span>';
+  return'<span class="badge b-o">'+c+'</span>';
+}
+function isShared(m){return SHARED.some(s=>m.toLowerCase().includes(s.toLowerCase().split(' ')[0])||s.toLowerCase().includes(m.toLowerCase().split(' ')[0]));}
+
+function renderOverview(){
+  const cohort=document.getElementById('f-cohort').value;
+  const q=document.getElementById('f-search').value.toLowerCase();
+  let data=PAPERS;
+  if(cohort==='Other')data=data.filter(r=>r.cohort!=='TEDDY NCC1'&&r.cohort!=='DIPP'&&r.cohort!=='DAISY');
+  else if(cohort)data=data.filter(r=>r.cohort===cohort);
+  if(q)data=data.filter(r=>r.mets.some(m=>m.toLowerCase().includes(q))||r.title.toLowerCase().includes(q)||r.conclusion.toLowerCase().includes(q)||r.authors.toLowerCase().includes(q));
+  const tbody=document.getElementById('ov-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="9" class="no-results">No matching papers found</td></tr>';return;}
+  tbody.innerHTML=data.map(r=>{
+    const mets=r.mets.map(m=>`<span class="tag${isShared(m)?' hl':''}">${m}</span>`).join('');
+    return`<tr>
+      <td class="mono">${r.n}</td>
+      <td><a class="paper-link" href="${r.url}" target="_blank">${r.title}</a><div class="jrnl">${r.authors} &middot; ${r.journal} &middot; ${r.year}</div></td>
+      <td>${cohortBadge(r.cohort)}</td>
+      <td style="font-size:11px">${r.modality}</td>
+      <td style="font-size:11px">${r.ncases}<br><span style="color:var(--ink3)">ctrl: ${r.nctrl}</span></td>
+      <td style="font-size:11px">${r.age}</td>
+      <td style="font-size:11px">${r.aab}</td>
+      <td>${mets}</td>
+      <td style="font-size:11px">${r.conclusion}</td>
+    </tr>`;
+  }).join('');
+}
+
+const METS=[
+  {name:'Phosphatidylcholines (PCs)',count:6,papers:'#1 #3 #4 #5 #7 #8',cohorts:'DIPP + TEDDY NCC1',dir:'↓ in IA/T1D progressors consistently across cohorts from birth onward; the most robustly replicated cross-cohort lipid signal',top:true},
+  {name:'Sphingomyelins (SMs)',count:5,papers:'#4 #5 #7 #8 #15',cohorts:'TEDDY NCC1 + DIPP + non-T1D',dir:'↓ in progressors; mechanistically linked to monocyte cytokine suppression (Fu 2025, #15)',top:true},
+  {name:'Triglycerides (TGs)',count:5,papers:'#1 #3 #4 #7 #8',cohorts:'DIPP + TEDDY NCC1',dir:'Complex: ↓ in early infancy (#1, #8); unsaturated TGs ↓ at seroconversion (#3, #4) — stage-dependent directionality',top:true},
+  {name:'Adipic acid',count:3,papers:'#4 #6 + GEE',cohorts:'TEDDY NCC1 + GEE analysis',dir:'↑ in higher mAb+ risk (#4); ML predictor (#6); GEE adds first ND→AAB+→T1D longitudinal three-stage gradient',top:true},
+  {name:'Phosphatidylethanolamines (PEs)',count:3,papers:'#3 #4 #5',cohorts:'TEDDY NCC1',dir:'↓ in IA cases, especially ether-linked PEs; consistent across three TEDDY NCC1 analyses'},
+  {name:'Ether phospholipids / plasmalogens',count:3,papers:'#1 #3 #4',cohorts:'DIPP + TEDDY NCC1',dir:'Consistently ↓ across both DIPP and TEDDY NCC1; one of few cross-cohort validated signals'},
+  {name:'Lysophosphatidylcholines (LPCs)',count:3,papers:'#1 #6 #7',cohorts:'DIPP + TEDDY NCC1',dir:'↑ pro-inflammatory LysoPCs pre-seroconversion (DIPP #1); LPC(18:2/18:3) in ML model (#6); ↓ LPCs in T1D progressors (#7)'},
+  {name:'BCAAs (Leu / Ile / Val)',count:2,papers:'#1 #3',cohorts:'DIPP + TEDDY NCC1',dir:'↓ before IAA-first seroconversion; cross-cohort validated in DIPP and TEDDY NCC1'},
+  {name:'Proline',count:2,papers:'#3 #4',cohorts:'TEDDY NCC1',dir:'↓ before GADA-first seroconversion; TEDDY NCC1 internal replication'},
+  {name:'GABA / γ-aminobutyric acid',count:2,papers:'#1 #3',cohorts:'DIPP + TEDDY NCC1',dir:'Associated with IAA-first; direction varies by age stratum (↓ within 1 year before IAA-first in DIPP)'},
+  {name:'Ascorbic acid / DHAA',count:2,papers:'#3 #7',cohorts:'TEDDY NCC1',dir:'DHAA risk factor for both first-IA subtypes (#3); lower ascorbic acid predicts earlier IAA-first onset (#7)'},
+  {name:'25(OH)D — vitamin D',count:2,papers:'#5 #7',cohorts:'TEDDY NCC1',dir:'↓ in T1D progressors (#7); included in multi-omics dietary biomarker signature (#5)'},
+  {name:'Ceramides',count:2,papers:'#5 #6',cohorts:'TEDDY NCC1',dir:'Ceramide d42:0 as ML predictor for IA (#6); ceramides enriched in lipid dysregulation pathways (#5)'},
+  {name:'Succinic acid',count:2,papers:'#1 #4',cohorts:'DIPP + TEDDY NCC1',dir:'↓ at birth in DIPP (#1); part of dicarboxylic acid group with adipic acid in TEDDY NCC1 (#4)'},
+];
+
+function renderMets(){
+  document.getElementById('met-grid').innerHTML=METS.map(m=>`
+    <div class="met-card${m.top?' top':''}">
+      <div class="met-count">${m.count}</div>
+      <div>
+        <div class="met-name">${m.name}</div>
+        <div class="met-papers">Papers: ${m.papers} &nbsp;&middot;&nbsp; ${m.cohorts}</div>
+        <div class="met-dir">${m.dir}</div>
+      </div>
+    </div>`).join('');
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+renderOverview();
+renderMets();
+</script>
+</body>
+</html>

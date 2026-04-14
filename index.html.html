@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAI-T1D Resource Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS
+   Academic clean — GLKB-inspired teal/blue
+   ══════════════════════════════════════════ */
+:root {
+  --bg: #f8fafb;
+  --bg-white: #ffffff;
+  --bg-subtle: #f0f4f6;
+  --bg-hover: #e8f0f4;
+  --border: #dce4ea;
+  --border-hover: #9ec5d4;
+  --text: #1a2b3c;
+  --text-secondary: #4a6274;
+  --text-muted: #8899a8;
+  --teal-600: #0d9488;
+  --teal-500: #14b8a6;
+  --teal-100: #ccfbf1;
+  --teal-50: #f0fdfa;
+  --blue-700: #1d4e89;
+  --blue-600: #2563a0;
+  --blue-500: #3b82c4;
+  --blue-100: #dbeafe;
+  --blue-50: #eff6ff;
+  --emerald-600: #059669;
+  --amber-600: #d97706;
+  --amber-100: #fef3c7;
+  --rose-600: #e11d48;
+  --violet-600: #7c3aed;
+  --violet-100: #ede9fe;
+  --shadow-sm: 0 1px 3px rgba(26,43,60,0.06);
+  --shadow-md: 0 4px 16px rgba(26,43,60,0.08);
+  --shadow-lg: 0 8px 32px rgba(26,43,60,0.10);
+  --shadow-hover: 0 12px 40px rgba(26,43,60,0.13);
+  --radius: 12px;
+  --radius-lg: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Background texture ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(14,184,166,0.05), transparent),
+    radial-gradient(ellipse 60% 50% at 85% 80%, rgba(37,99,160,0.04), transparent);
+}
+
+.container { max-width: 1140px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+/* ══════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════ */
+header {
+  padding: 56px 0 0;
+  text-align: center;
+}
+
+.project-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal-50);
+  border: 1px solid rgba(14,184,166,0.2);
+  border-radius: 100px;
+  padding: 6px 18px 6px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  color: var(--teal-600);
+  letter-spacing: 0.3px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.5s ease both;
+}
+.project-badge .dot {
+  width: 7px; height: 7px;
+  background: var(--teal-500);
+  border-radius: 50%;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+h1 {
+  font-family: 'Source Serif 4', serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 14px;
+  animation: fadeUp 0.5s 0.05s ease both;
+}
+h1 .accent {
+  color: var(--teal-600);
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 10px;
+  line-height: 1.6;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.meta-line {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+  animation: fadeUp 0.5s 0.15s ease both;
+}
+.meta-line span {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.meta-line span + span::before {
+  content: '·';
+  margin: 0 8px;
+  color: var(--border);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   STATS BAR
+   ══════════════════════════════════════════ */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: 36px auto 0;
+  max-width: 680px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-white);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+.stat {
+  flex: 1;
+  padding: 18px 16px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Source Serif 4', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--blue-700);
+}
+.stat-label {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+/* ══════════════════════════════════════════
+   FILTER / SEARCH
+   ══════════════════════════════════════════ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 40px 0 32px;
+  animation: fadeUp 0.5s 0.25s ease both;
+}
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+.filter-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+.filter-btn.active {
+  background: var(--teal-50);
+  border-color: rgba(14,184,166,0.3);
+  color: var(--teal-600);
+}
+
+.search-box {
+  position: relative;
+}
+.search-box input {
+  width: 220px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px 7px 34px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+}
+.search-box input::placeholder { color: var(--text-muted); }
+.search-box input:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px rgba(14,184,166,0.08);
+}
+.search-box svg {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════════
+   SECTION HEADERS
+   ══════════════════════════════════════════ */
+.section {
+  margin-bottom: 40px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.section-head h2 {
+  font-family: 'Source Serif 4', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  flex: 1;
+}
+.section-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-radius: 6px;
+  padding: 3px 10px;
+}
+
+/* ══════════════════════════════════════════
+   CARD GRID
+   ══════════════════════════════════════════ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+/* ══════════════════════════════════════════
+   CARDS
+   ══════════════════════════════════════════ */
+.card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+.card:hover::after { opacity: 1; }
+
+.card[data-accent="teal"]::after { background: var(--teal-500); }
+.card[data-accent="blue"]::after { background: var(--blue-500); }
+.card[data-accent="emerald"]::after { background: var(--emerald-600); }
+.card[data-accent="amber"]::after { background: var(--amber-600); }
+.card[data-accent="violet"]::after { background: var(--violet-600); }
+.card[data-accent="rose"]::after { background: var(--rose-600); }
+
+.card-row-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-icon-wrap {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  overflow: hidden;
+}
+.card-icon-wrap img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.card-icon-wrap.teal { background: var(--teal-50); color: var(--teal-600); }
+.card-icon-wrap.blue { background: var(--blue-50); color: var(--blue-600); }
+.card-icon-wrap.emerald { background: rgba(5,150,105,0.08); color: var(--emerald-600); }
+.card-icon-wrap.amber { background: var(--amber-100); color: var(--amber-600); }
+.card-icon-wrap.violet { background: var(--violet-100); color: var(--violet-600); }
+.card-icon-wrap.rose { background: rgba(225,29,72,0.08); color: var(--rose-600); }
+.card-icon-wrap.img-wrap { background: var(--bg-white); }
+
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+.badge.live { background: rgba(5,150,105,0.08); color: var(--emerald-600); border: 1px solid rgba(5,150,105,0.15); }
+.badge.beta { background: rgba(217,119,6,0.08); color: var(--amber-600); border: 1px solid rgba(217,119,6,0.15); }
+.badge.coming { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border); }
+.badge.published { background: rgba(124,58,237,0.06); color: var(--violet-600); border: 1px solid rgba(124,58,237,0.12); }
+.badge.submitted { background: rgba(37,99,160,0.06); color: var(--blue-600); border: 1px solid rgba(37,99,160,0.12); }
+.badge.github { background: rgba(26,43,60,0.06); color: var(--text-secondary); border: 1px solid rgba(26,43,60,0.1); }
+
+.card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  letter-spacing: -0.1px;
+}
+.card .desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  flex: 1;
+}
+.card .card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg-subtle);
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.card-link {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal-600);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.3s ease;
+}
+.card:hover .card-link {
+  opacity: 1;
+  transform: translateX(0);
+}
+.card-link svg {
+  width: 14px; height: 14px;
+}
+
+/* ══════════════════════════════════════════
+   WIKI MODAL OVERLAY
+   ══════════════════════════════════════════ */
+.wiki-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg);
+  overflow-y: auto;
+}
+.wiki-overlay.active { display: block; }
+.wiki-overlay-inner {
+  max-width: 640px;
+  margin: 80px auto;
+  padding: 0 28px;
+}
+.wiki-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--teal-600);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 40px;
+  padding: 0;
+}
+.wiki-back-btn:hover { opacity: 0.75; }
+.wiki-page-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background: var(--teal-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+.wiki-page-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.wiki-access-notice {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal-500);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  box-shadow: var(--shadow-sm);
+}
+.wiki-access-notice strong {
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════ */
+footer {
+  margin-top: 32px;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.pi-labs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.pi-chip:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+}
+.pi-chip .inst {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.footer-bottom a {
+  color: var(--teal-600);
+  text-decoration: none;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  header { padding: 36px 0 0; }
+  .card-grid { grid-template-columns: 1fr; }
+  .stats-bar { flex-wrap: wrap; }
+  .stat { min-width: 33.3%; border-bottom: 1px solid var(--border); }
+  .toolbar { flex-direction: column; align-items: flex-start; }
+  .search-box input { width: 100%; }
+}
+
+/* ══════════════════════════════════════════
+   UTILITY
+   ══════════════════════════════════════════ */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ═══════ WIKI SUBPAGE OVERLAY ═══════ -->
+<div class="wiki-overlay" id="wikiOverlay">
+  <div class="wiki-overlay-inner">
+    <button class="wiki-back-btn" onclick="closeWikiPage()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Resource Hub
+    </button>
+    <div class="wiki-page-icon">📘</div>
+    <div class="wiki-page-title">MAI-T1D Project Wiki</div>
+    <div class="wiki-access-notice">
+      Access need email <strong>kailiua@umich.edu</strong> — open only for NIH audit and internal use.
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════ HEADER ═══════ -->
+<header>
+  <div class="project-badge">
+    <span class="dot"></span>
+    NIH/ODSS funded
+  </div>
+  <h1>MAI-T1D <span class="accent">Resource Hub</span></h1>
+  <p class="subtitle">
+    Tools, data platforms, foundation models, and publications for multimodal AI research in Type 1 Diabetes — all in one place.
+  </p>
+  <p class="meta-line">
+    <span>University of Michigan</span>
+    <span>Vanderbilt</span>
+    <span>Cornell</span>
+    <span>USF</span>
+    <span>UCLA</span>
+  </p>
+</header>
+
+<!-- ═══════ STATS ═══════ -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">~ 40K+</div><div class="stat-label">Samples</div></div>
+  <div class="stat"><div class="stat-num">200+</div><div class="stat-label">HPAP Donors</div></div>
+  <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Modalities</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Institutions</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-label">Foundation Models</div></div>
+</div>
+
+<!-- ═══════ TOOLBAR ═══════ -->
+<div class="toolbar">
+  <div class="filter-group" id="filterGroup">
+    <button class="filter-btn active" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" onclick="setFilter('fm')">Foundation Models</button>
+    <button class="filter-btn" onclick="setFilter('platform')">Platforms</button>
+    <button class="filter-btn" onclick="setFilter('tool')">Tools &amp; Agents</button>
+    <button class="filter-btn" onclick="setFilter('litreview')">Literature Review</button>
+    <button class="filter-btn" onclick="setFilter('wiki')">Wiki &amp; Docs</button>
+  </div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Search resources…" oninput="doSearch()">
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION: Foundation Models
+     ═══════════════════════════════════════ -->
+<div class="section" data-section="fm">
+  <div class="section-head">
+    <div class="section-icon" style="background:var(--blue-50);color:var(--blue-600)">🤖</div>
+    <h2>Foundation Models</h2>
+    <span class="section-count">4 models</span>
+  </div>
+  <div class="card-grid">
+
+    <!-- EPCOT-v2 -->
+    <a class="card" data-accent="violet" data-cat="fm" data-search="epcot genomics foundation model dna chromatin epigenomics" href="https://epcot.io/" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap violet">🧪</div>
+        <span class="badge github">GitHub</span>
+      </div>
+      <h3>Genomics Foundation Model</h3>
+      <p class="desc">Predicts epigenomic profiles and chromatin organization from DNA sequences. Core genomic FM of the MAI-T1D foundation stack.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Genomics</span><span class="tag">Epigenomics</span><span class="tag">DNA</span></div>
+        <span class="card-link">GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- scFM -->
+    <a class="card" data-accent="violet" data-cat="fm" data-search="single cell foundation model rna scfm epiagent transcriptomics" href="https://github.com/BaoXinyu2002/single_cell_FM" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap violet">🔬</div>
+        <span class="badge github">GitHub</span>
+      </div>
+      <h3>Sing-cell Foundation Model</h3>
+      <p class="desc">Foundation model for single-cell transcriptomics and epigenomics analysis. Supports cell-type annotation, gene program discovery, and perturbation prediction.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">scRNA-seq</span><span class="tag">scATAC-seq</span></div>
+        <span class="card-link">GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- Kronos -->
+    <a class="card" data-accent="violet" data-cat="fm" data-search="spatial foundation model transcriptomics tissue kronos" href="#" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap violet">🗺️</div>
+        <span class="badge github">GitHub</span>
+      </div>
+      <h3>Spatial Foundation Model</h3>
+      <p class="desc">Foundation model for spatial transcriptomics. Models tissue architecture and cell–cell interactions in pancreatic islet microenvironments.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Spatial</span><span class="tag">CODEX</span><span class="tag">H&amp;E</span></div>
+        <span class="card-link">GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- Knowledge Graph Government System -->
+    <a class="card" data-accent="amber" data-cat="fm" data-search="knowledge graph government system governance" href="https://mai-t1d-demo0316.vercel.app/" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap amber">🕸️</div>
+        <span class="badge beta">Demo</span>
+      </div>
+      <h3>Knowledge Graph Government System</h3>
+      <p class="desc">Interactive knowledge graph governance system for multimodal AI training data management across the MAI-T1D consortium.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Knowledge Graph</span><span class="tag">Governance</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION: Knowledge & Data Platforms
+     ═══════════════════════════════════════ -->
+<div class="section" data-section="platform">
+  <div class="section-head">
+    <div class="section-icon" style="background:var(--teal-50);color:var(--teal-600)">🧬</div>
+    <h2>Knowledge &amp; Data Platforms</h2>
+    <span class="section-count">7 resources</span>
+  </div>
+  <div class="card-grid">
+
+    <!-- GLKB -->
+    <a class="card" data-accent="teal" data-cat="platform" data-search="glkb genomics literature knowledge base pubmed agentic qa hypothesis" href="#" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap img-wrap"><img src="ICONS/GLKB.png" alt="GLKB"></div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>GLKB — Genomics Literature Knowledge Base</h3>
+      <p class="desc">PubMed-integrated knowledge platform with ML-enhanced search, agentic Q&amp;A in biomedicine, and AI-driven hypothesis generation.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">PubMed</span><span class="tag">NLP</span><span class="tag">Knowledge Graph</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- PanKbase -->
+    <a class="card" data-accent="teal" data-cat="platform" data-search="pankbase pancreas knowledge graph hirn diabetes" href="https://pankgraph.org/" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap img-wrap"><img src="ICONS/PanKbase.jpg" alt="PanKbase"></div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>PanKbase</h3>
+      <p class="desc">PanKbase is a comprehensive, centralized resource for the study of the human pancreas and diabetes.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">HIRN</span><span class="tag">Pancreas</span><span class="tag">Diabetes</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- HPAP -->
+    <a class="card" data-accent="blue" data-cat="platform" data-search="hpap human pancreas analysis program donor portal multimodal islet" href="https://hirnetwork.org/hpap-overview" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap img-wrap"><img src="ICONS/HPAP.jpg" alt="HPAP"></div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>HPAP — Human Pancreas Analysis Program</h3>
+      <p class="desc">The Human Pancreas Analysis Program seeks to provide comprehensive molecular profiling in unprecedented detail of the pancreatic islet at various stages of type 1 diabetes.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">200+ Donors</span><span class="tag">20+ Modalities</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- TEDDY -->
+    <a class="card" data-accent="blue" data-cat="platform" data-search="teddy ncc1 metabolomics virome longitudinal cohort environmental determinants" href="https://teddy.epi.usf.edu/" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap img-wrap"><img src="ICONS/TEDDY.jpg" alt="TEDDY"></div>
+        <span class="badge coming">Cohort</span>
+      </div>
+      <h3>TEDDY NCC1</h3>
+      <p class="desc">The TEDDY study - The Environmental Determinants of Diabetes in the Young - is looking for the causes of type 1 diabetes mellitus (T1DM).</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Metabolomics</span><span class="tag">Virome</span><span class="tag">Longitudinal</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- ImmPort -->
+    <a class="card" data-accent="blue" data-cat="platform" data-search="immport immunology database portal niaid" href="https://www.immport.org/home" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap img-wrap"><img src="ICONS/IMMPORT.jpg" alt="ImmPort"></div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>ImmPort</h3>
+      <p class="desc">ImmPort is funded by the NIH, NIAID and DAIT in support of the NIH mission to share data with the public.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Immunology</span><span class="tag">Open Data</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- AI ready Datasets - HPAP -->
+    <a class="card" data-accent="teal" data-cat="platform" data-search="ai ready datasets hpap human pancreas analysis program processed curated" href="hpap-datasets.html" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap teal">🗄️</div>
+        <span class="badge coming">Coming Soon</span>
+      </div>
+      <h3>AI ready Datasets - HPAP</h3>
+      <p class="desc">Curated, AI-ready datasets derived from the Human Pancreas Analysis Program — preprocessed and standardized for direct use in MAI-T1D foundation model training and benchmarking.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">HPAP</span><span class="tag">AI-Ready</span><span class="tag">Multimodal</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- Use Cases -->
+    <a class="card" data-accent="blue" data-cat="platform" data-search="use cases applications t1d diabetes ai demos tutorials examples" href="use-cases.html" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap blue">💡</div>
+        <span class="badge coming">Coming Soon</span>
+      </div>
+      <h3>Use Cases</h3>
+      <p class="desc">Showcased applications and end-to-end workflows demonstrating how MAI-T1D models and data platforms can be applied to real-world T1D research questions.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Applications</span><span class="tag">Workflows</span><span class="tag">T1D</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION: Tools & Agents & Governance
+     ═══════════════════════════════════════ -->
+<div class="section" data-section="tool">
+  <div class="section-head">
+    <div class="section-icon" style="background:rgba(217,119,6,0.08);color:var(--amber-600)">⚙️</div>
+    <h2>Tools, Agents &amp; Governance</h2>
+    <span class="section-count">2 resources</span>
+  </div>
+  <div class="card-grid">
+
+    <!-- KG Governance Demo -->
+    <a class="card" data-accent="amber" data-cat="tool" data-search="knowledge graph governance provenance data trace prov demo" href="#" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap amber">🕸️</div>
+        <span class="badge beta">Demo</span>
+      </div>
+      <h3>Data Governance Knowledge Graph</h3>
+      <p class="desc">PROV-inspired knowledge graph for automated governance of evolving multimodal AI training data. Interactive demo with provenance graph, impact analysis, and governance agent views.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">W3C PROV</span><span class="tag">Neo4j</span><span class="tag">Vercel</span></div>
+        <span class="card-link">Demo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <!-- MAI-T1D Foundation Stack -->
+    <a class="card" data-accent="blue" data-cat="tool" data-search="mai-t1d foundation stack github models pipeline" href="https://github.com/USF-HII/MAI-T1D-Foundation-Stack" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap blue">💻</div>
+        <span class="badge github">GitHub</span>
+      </div>
+      <h3>MAI-T1D Foundation Stack</h3>
+      <p class="desc">Central GitHub repository for the MAI-T1D foundation model stack — integrating genomics, single-cell, and spatial foundation models for T1D research.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Foundation Models</span><span class="tag">Pipeline</span></div>
+        <span class="card-link">GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION: Literature Review
+     ═══════════════════════════════════════ -->
+<div class="section" data-section="litreview">
+  <div class="section-head">
+    <div class="section-icon" style="background:var(--violet-100);color:var(--violet-600)">📖</div>
+    <h2>Literature Review</h2>
+    <span class="section-count">1 resource</span>
+  </div>
+  <div class="card-grid">
+
+    <!-- TEDDY Metabolomics -->
+    <a class="card" data-accent="violet" data-cat="litreview" data-search="teddy metabolomics lipidomics literature review" href="https://teddy-data-metabolomics-lipidomics.vercel.app/" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap violet">📑</div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>TEDDY Metabolomics</h3>
+      <p class="desc">Literature review and data explorer for TEDDY metabolomics and lipidomics datasets — supporting multimodal T1D research and biomarker discovery.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">TEDDY</span><span class="tag">Metabolomics</span><span class="tag">Lipidomics</span></div>
+        <span class="card-link">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION: Wiki & Documentation
+     ═══════════════════════════════════════ -->
+<div class="section" data-section="wiki">
+  <div class="section-head">
+    <div class="section-icon" style="background:var(--bg-subtle);color:var(--text-secondary)">📖</div>
+    <h2>Wiki &amp; Documentation</h2>
+    <span class="section-count">2 resources</span>
+  </div>
+  <div class="card-grid">
+
+    <a class="card" data-accent="teal" data-cat="wiki" data-search="wiki documentation internal knowledge onboarding protocol" href="#" onclick="openWikiPage(event)">
+      <div class="card-row-top">
+        <div class="card-icon-wrap teal">📘</div>
+        <span class="badge live">Live</span>
+      </div>
+      <h3>MAI-T1D Project Wiki</h3>
+      <p class="desc">Internal knowledge base covering project protocols, data dictionaries, onboarding guides, and cross-institutional coordination documentation.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Wiki</span><span class="tag">Docs</span></div>
+        <span class="card-link">Open <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+    <a class="card" data-accent="blue" data-cat="wiki" data-search="github repository code organization mai-t1d" href="https://github.com/silverichim/mai-t1d-model-card-and-data-card" target="_blank">
+      <div class="card-row-top">
+        <div class="card-icon-wrap blue">💻</div>
+        <span class="badge github">GitHub</span>
+      </div>
+      <h3>MAI-T1D GitHub Organization</h3>
+      <p class="desc">Central code repository for all MAI-T1D foundation models, analysis pipelines, governance tools, and shared utilities.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">Code</span><span class="tag">Repos</span></div>
+        <span class="card-link">GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div class="container">
+    <div class="footer-label">Participating Laboratories</div>
+    <div class="pi-labs">
+      <a class="pi-chip" href="https://jieliu6.github.io/" target="_blank">Jie Liu Lab <span class="inst">UMich</span></a>
+      <a class="pi-chip" href="http://theparkerlab.org/" target="_blank">Steve Parker Lab <span class="inst">UMich</span></a>
+      <a class="pi-chip" href="https://www.powersbrissovaresearch.org/" target="_blank">Marcela Brissova Lab <span class="inst">Vanderbilt</span></a>
+      <a class="pi-chip" href="https://www.chen-stemcell-lab.com/" target="_blank">Shuibing Chen Lab <span class="inst">Cornell</span></a>
+      <a class="pi-chip" href="https://www.hii.usf.edu/faculty-and-staff/KennethYoung.html" target="_blank">USF PI Kenneth Young <span class="inst">USF</span></a>
+      <a class="pi-chip" href="https://web.cs.ucla.edu/~weiwang/" target="_blank">Wei Wang Lab <span class="inst">UCLA</span></a>
+      <a class="pi-chip" href="https://web.cs.ucla.edu/~kwchang/" target="_blank">UCLA PI Kai-Wei Chang <span class="inst">UCLA</span></a>
+    </div>
+    <div class="footer-bottom">
+      MAI-T1D is supported by the National Institutes of Health · <a href="#">NIH Grant Info</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Filter Logic ──
+let currentFilter = 'all';
+
+function setFilter(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  applyFilters();
+}
+
+function doSearch() {
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sections = document.querySelectorAll('.section');
+
+  sections.forEach(sec => {
+    const sectionCat = sec.dataset.section;
+    const cards = sec.querySelectorAll('.card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardCat = card.dataset.cat;
+      const searchText = (card.dataset.search || '') + ' ' + card.textContent.toLowerCase();
+      const matchFilter = currentFilter === 'all' || cardCat === currentFilter;
+      const matchSearch = !query || searchText.includes(query);
+
+      if (matchFilter && matchSearch) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Show/hide entire section
+    if (currentFilter !== 'all' && sectionCat !== currentFilter) {
+      sec.style.display = 'none';
+    } else {
+      sec.style.display = visibleCount > 0 || currentFilter === 'all' ? '' : 'none';
+    }
+  });
+}
+
+// ── Wiki Overlay ──
+function openWikiPage(e) {
+  e.preventDefault();
+  document.getElementById('wikiOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWikiPage() {
+  document.getElementById('wikiOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ── Stagger card entrance animations ──
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(16px)';
+    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease';
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 80 + i * 60);
+  });
+});
+</script>
+
+</body>
+</html>
